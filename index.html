@@ -1,221 +1,596 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-<meta charset="UTF-8">
+<html lang="en" class="dark"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Galactic Archives - Worldbuilding Wiki</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 
 <style>
-body { background:#000; color:#e2e8f0; }
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:#02040a}
-::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#334155}
-.text-glow{text-shadow:0 0 30px rgba(59,130,246,.3)}
-.btn-glow{box-shadow:0 0 20px -5px rgba(59,130,246,.5)}
-.fade-enter{opacity:0;transform:translateY(10px);animation:fadein .3s forwards ease-out}
-@keyframes fadein{to{opacity:1;transform:none}}
-</style>
-</head>
+body {
+background-color: #000;
+color: #e2e8f0;
+}
+/* Custom scrollbar */
+::-webkit-scrollbar {
+width: 6px;
+}
+::-webkit-scrollbar-track {
+background: #02040a;
+}
+::-webkit-scrollbar-thumb {
+background: #1e293b;
+border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #334155;
+}
+.text-glow {
+text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+.btn-glow {
+box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.5);
+}
+.fade-enter {
+opacity: 0;
+transform: translateY(10px);
+animation: fadein 0.3s forwards ease-out;
+}
+@keyframes fadein {
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+</style></head>
 
-<body class="font-sans min-h-screen flex flex-col overflow-hidden">
+  <body class="font-sans min-h-screen bg-space-950 bg-star-gradient bg-no-repeat bg-fixed selection:bg-blue-500/30 selection:text-blue-100 flex flex-col overflow-hidden">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-space-950/80 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <!-- Logo -->
+          <a href="#" onclick="renderHome()" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 opacity-80 group-hover:opacity-100 transition-opacity blur-[1px]"></div>
+            <span class="text-2xl tracking-tight font-normal text-white group-hover:text-glow transition-all">
+              Galactic
+            </span>
+          </a>
 
-<nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-md">
-  <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-    <a onclick="renderHome()" class="text-2xl text-white cursor-pointer">Galactic</a>
+          <!-- Desktop Nav -->
+          <div class="hidden md:flex items-center gap-6 text-sm font-light text-gray-400">
+            <button onclick="renderDashboard()" class="hover:text-white transition-colors">
+              Dashboard
+            </button>
+            <button onclick="renderCategory('Lore')" class="hover:text-white transition-colors">
+              Lore
+            </button>
+            <button onclick="renderCategory('Characters')" class="hover:text-white transition-colors">
+              Characters
+            </button>
+            <button onclick="renderCategory('Locations')" class="hover:text-white transition-colors">
+              Locations
+            </button>
+          </div>
+        </div>
 
-    <div class="flex gap-4">
-      <button onclick="openEditor()" class="px-4 py-2 bg-white/10 rounded-full">New Entry</button>
+        <div class="flex items-center gap-4">
+          <!-- Search -->
+          <div class="relative hidden sm:block group">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+            <input type="text" id="globalSearch" placeholder="Search archives..." oninput="handleSearch(this.value)" class="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all w-64">
+            <!-- Dropdown for search results -->
+            <div id="searchResults" class="absolute top-full mt-2 left-0 w-full bg-space-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden"></div>
+          </div>
 
-      <!-- DRIVE BUTTON -->
-      <button id="driveConnectBtn"
-        disabled
-        onclick="toggleDriveConnection()"
-        class="px-4 py-2 bg-white/10 rounded-full flex gap-2 items-center opacity-50 cursor-not-allowed">
-        <i data-lucide="cloud"></i>
-        <span id="driveStatusText">Connect Drive</span>
-      </button>
+          <!-- New Entry Button -->
+          <button onclick="openEditor()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 hover:border-blue-400/30 text-white px-5 py-2 rounded-full text-sm font-light transition-all btn-glow group">
+            <span>New Entry</span>
+            <i data-lucide="plus" class="w-4 h-4 group-hover:rotate-90 transition-transform"></i>
+          </button>
+
+          <button class="md:hidden text-gray-400 hover:text-white">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar (Optional for larger screens, hidden on mobile for now) -->
+      <aside class="w-64 border-r border-white/5 bg-space-950/50 hidden lg:flex flex-col py-8 px-4 gap-6 overflow-y-auto">
+        <div class="px-2">
+          <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-4 font-medium">
+            Library
+          </h3>
+          <nav class="flex flex-col gap-1">
+            <button onclick="renderDashboard()" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i>
+              Overview
+            </button>
+            <button onclick="renderCategory('Lore')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              Lore
+            </button>
+            <button onclick="renderCategory('Characters')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              Characters
+            </button>
+            <button onclick="renderCategory('Locations')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="map" class="w-4 h-4"></i>
+              Locations
+            </button>
+            <button onclick="renderCategory('Factions')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="flag" class="w-4 h-4"></i>
+              Factions
+            </button>
+            <button onclick="renderCategory('Magic')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Magic Systems
+            </button>
+            <button onclick="renderCategory('Events')" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white text-left text-sm transition-colors">
+              <i data-lucide="hourglass" class="w-4 h-4"></i>
+              Events
+            </button>
+          </nav>
+        </div>
+
+        <div class="px-2 mt-auto">
+          <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-4 font-medium">
+            System
+          </h3>
+          <div class="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/5 rounded-xl p-4">
+            <p class="text-xs text-blue-200 mb-2">
+              Wiki Status:
+              <span class="text-green-400">Online</span>
+            </p>
+            <div class="w-full bg-space-900 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full w-3/4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+            </div>
+            <p class="text-[10px] text-gray-500 mt-2 text-right">
+              v2.4.0 Galactic
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Dynamic Content Area -->
+      <main id="appContent" class="flex-1 overflow-y-auto relative p-6 md:p-12 scroll-smooth">
+        <!-- Content injected via JS -->
+      </main>
     </div>
-  </div>
-</nav>
 
-<main id="appContent" class="flex-1 overflow-y-auto p-8"></main>
+    <!-- JavaScript Application Logic -->
+    <button id="scrollTopBtn" onclick="document.getElementById('appContent').scrollTo({ top: 0, behavior: 'smooth' })" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full btn-glow opacity-0 translate-y-10 pointer-events-none transition-all duration-500 hover:bg-blue-500 hover:scale-110 group">
+      <i data-lucide="arrow-up" class="w-6 h-6 group-hover:-translate-y-1 transition-transform"></i>
+    </button>
+    <script>
+      (function() {
+          const content = document.getElementById('appContent');
+          const btn = document.getElementById('scrollTopBtn');
+          if (content && btn) {
+              content.addEventListener('scroll', () => {
+                  const show = content.scrollTop > 300;
+                  btn.classList.toggle('opacity-0', !show);
+                  btn.classList.toggle('translate-y-10', !show);
+                  btn.classList.toggle('pointer-events-none', !show);
+              });
+          }
+      })();
+    </script>
+    <script>
+      // --- Mock Database ---
+      const initialData = [
+          {
+              id: '1',
+              title: 'The Great Expansion',
+              category: 'Events',
+              tags: ['History', 'Space Travel'],
+              content: 'The Great Expansion marked the beginning of humanity\'s journey beyond the Sol system. Fueled by the discovery of the Void Drive, colony ships were dispatched to the Proxima Centauri and Wolf 1061 systems.\n\nIt was a time of unparalleled hope and dangerous ambition.',
+              lastUpdated: '2045-10-12'
+          },
+          {
+              id: '2',
+              title: 'Commander Vex',
+              category: 'Characters',
+              tags: ['Hero', 'Military', 'Human'],
+              content: 'Commander Vex is a legendary figure in the Terran Fleet. Known for his tactical brilliance during the Siege of Orion, he single-handedly coordinated the defense of the colony using repurposed mining drones.',
+              lastUpdated: '2045-11-05'
+          },
+          {
+              id: '3',
+              title: 'Void Drive',
+              category: 'Magic',
+              tags: ['Technology', 'Physics'],
+              content: 'The Void Drive manipulates dark matter to fold local space-time, allowing for faster-than-light travel without time dilation effects usually associated with relativistic speeds. However, prolonged exposure to the Void field can cause hallucinations.',
+              lastUpdated: '2045-09-20'
+          },
+          {
+              id: '4',
+              title: 'Sector 7',
+              category: 'Locations',
+              tags: ['Industrial', 'Dangerous'],
+              content: 'A lawless region on the outer rim. Known for its black markets and ship chop shops. The Galactic Federation has no official presence here.',
+              lastUpdated: '2045-12-01'
+          }
+      ];
 
-<script>
-/* =======================
-   DATA
-======================= */
-const initialData = [
-  {id:'1',title:'The Great Expansion',category:'Events',tags:['History'],content:'Humanity expands.',lastUpdated:'2045-10-12'}
-];
-let entries = JSON.parse(localStorage.getItem('wikiEntries')) || initialData;
+      // --- State Management ---
+      let entries = JSON.parse(localStorage.getItem('wikiEntries')) || initialData;
 
-/* =======================
-   GOOGLE DRIVE CONFIG
-======================= */
-const GOOGLE_CLIENT_ID = '1073328285370-leiiu235gcp0ujm9s7pagi6p9quui977.apps.googleusercontent.com';
-const DRIVE_FILE_NAME = 'galactic-archives-wiki.json';
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+      const saveToLocal = () => {
+          localStorage.setItem('wikiEntries', JSON.stringify(entries));
+      };
 
-let tokenClient;
-let driveFileId = localStorage.getItem('driveFileId');
-let isDriveConnected = localStorage.getItem('isDriveConnected') === 'true';
+      const categories = ['Lore', 'Characters', 'Locations', 'Timelines', 'Factions', 'Magic', 'Events'];
 
-/* =======================
-   LOAD GOOGLE SCRIPTS
-======================= */
-function loadScripts() {
-  const gapiScript = document.createElement('script');
-  gapiScript.src = 'https://apis.google.com/js/api.js';
-  gapiScript.onload = () => gapi.load('client', initGapi);
-  document.head.appendChild(gapiScript);
+      // --- Render Functions ---
 
-  const gisScript = document.createElement('script');
-  gisScript.src = 'https://accounts.google.com/gsi/client';
-  gisScript.onload = initGis;
-  document.head.appendChild(gisScript);
-}
+      // 1. Home View (Landing Style)
+      function renderHome() {
+          const container = document.getElementById('appContent');
+          container.innerHTML = `
+              <div class="flex flex-col items-center justify-center min-h-[80vh] text-center max-w-4xl mx-auto fade-enter relative z-10">
+                  <div class="absolute inset-0 bg-blue-500/10 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
 
-function initGapi() {
-  gapi.client.init({
-    discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-  });
-}
+                  <span class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-6 border border-blue-500/20 px-4 py-1.5 rounded-full bg-blue-500/5">System Initialized</span>
 
-function initGis() {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: SCOPES,
-    callback: onAuth
-  });
+                  <h1 class="text-6xl md:text-8xl font-normal text-white tracking-tighter mb-8 leading-[0.9] text-glow">
+                      EXPLORE <br/> <span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">THE ARCHIVES</span>
+                  </h1>
 
-  // ENABLE BUTTON
-  const btn = document.getElementById('driveConnectBtn');
-  btn.disabled = false;
-  btn.classList.remove('opacity-50','cursor-not-allowed');
-}
+                  <p class="text-xl md:text-2xl text-gray-400 font-light max-w-2xl mb-12 leading-relaxed">
+                      The central repository for all knowledge regarding the universe, its inhabitants, and the forces that shape our destiny.
+                  </p>
 
-/* =======================
-   AUTH CALLBACK (FIXED)
-======================= */
-async function onAuth(resp) {
-  if (resp.error) return console.error(resp);
+                  <div class="flex gap-6">
+                      <button onclick="renderDashboard()" class="group relative px-8 py-4 bg-blue-600 text-white rounded-full overflow-hidden transition-all hover:bg-blue-500 btn-glow flex items-center gap-3">
+                          <span class="relative z-10 text-base font-normal">Enter Database</span>
+                          <i data-lucide="arrow-right" class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform"></i>
+                          <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-300 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                      </button>
 
-  // 🔥 REQUIRED
-  gapi.client.setToken(resp);
+                      <button onclick="openEditor()" class="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-all flex items-center gap-3">
+                          <span class="text-base font-normal">Create Entry</span>
+                      </button>
+                  </div>
 
-  isDriveConnected = true;
-  localStorage.setItem('isDriveConnected','true');
-  updateDriveButton();
+                  <div class="mt-24 w-full relative">
+                      <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-8 text-left">
+                          ${[
+                              { label: 'Total Entries', value: entries.length },
+                              { label: 'Categories', value: categories.length },
+                              { label: 'Last Update', value: 'Today' },
+                              { label: 'System Status', value: 'Optimal' }
+                          ].map(stat => `
+                              <div>
+                                  <p class="text-4xl text-white font-light tracking-tight mb-1">${stat.value}</p>
+                                  <p class="text-xs text-blue-400/80 uppercase tracking-widest">${stat.label}</p>
+                              </div>
+                          `).join('')}
+                      </div>
+                  </div>
+              </div>
+          `;
+          lucide.createIcons();
+      }
 
-  await loadFromDrive().catch(()=>{});
-}
+      // 2. Dashboard View
+      function renderDashboard() {
+          const container = document.getElementById('appContent');
 
-/* =======================
-   DRIVE
-======================= */
-async function saveToDrive() {
-  const token = gapi.client.getToken();
-  if (!token) return;
+          // Get recent entries
+          const recentEntries = [...entries].sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).slice(0, 6);
 
-  const body = JSON.stringify(entries,null,2);
-  const boundary = 'foo_bar';
+          container.innerHTML = `
+              <div class="max-w-6xl mx-auto fade-enter">
+                  <header class="mb-12 border-b border-white/5 pb-8">
+                      <h2 class="text-4xl text-white tracking-tight font-normal mb-4">Dashboard</h2>
+                      <p class="text-lg text-gray-400 font-light">Welcome back, Architect. Here is the current state of the world.</p>
+                  </header>
 
-  const multipart =
-    `--${boundary}\r\nContent-Type: application/json\r\n\r\n`+
-    JSON.stringify({name:DRIVE_FILE_NAME})+
-    `\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n`+
-    body+`\r\n--${boundary}--`;
+                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                      <!-- Quick Stats / Featured -->
+                      <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          ${categories.slice(0, 4).map(cat => {
+                              const count = entries.filter(e => e.category === cat).length;
+                              return `
+                                  <div onclick="renderCategory('${cat}')" class="group cursor-pointer bg-white/[0.02] border border-white/5 hover:border-blue-500/30 p-6 rounded-2xl transition-all hover:bg-white/[0.04] relative overflow-hidden">
+                                      <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                          <i data-lucide="folder" class="w-16 h-16 text-blue-500"></i>
+                                      </div>
+                                      <h3 class="text-xl text-white font-normal mb-1">${cat}</h3>
+                                      <p class="text-sm text-gray-500">${count} entries</p>
+                                  </div>
+                              `;
+                          }).join('')}
+                      </div>
 
-  const url = driveFileId
-    ? `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`
-    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+                      <!-- Actions -->
+                      <div class="bg-gradient-to-b from-blue-900/10 to-transparent border border-white/5 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
+                          <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                              <i data-lucide="plus" class="w-8 h-8"></i>
+                          </div>
+                          <h3 class="text-xl text-white font-normal mb-2">Expand the World</h3>
+                          <p class="text-sm text-gray-400 mb-6 font-light">Add a new character, location, or event to the database.</p>
+                          <button onclick="openEditor()" class="w-full py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm">Create New Entry</button>
+                      </div>
+                  </div>
 
-  const res = await fetch(url,{
-    method: driveFileId ? 'PATCH':'POST',
-    headers:{
-      Authorization:`Bearer ${token.access_token}`,
-      'Content-Type':`multipart/related; boundary=${boundary}`
-    },
-    body:multipart
-  });
+                  <h3 class="text-xl text-white tracking-tight font-normal mb-6 flex items-center gap-2">
+                      <i data-lucide="clock" class="w-5 h-5 text-blue-500"></i> Recently Updated
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      ${recentEntries.map(entry => entryCard(entry)).join('')}
+                  </div>
+              </div>
+          `;
+          lucide.createIcons();
+      }
 
-  const data = await res.json();
-  if (!driveFileId) {
-    driveFileId = data.id;
-    localStorage.setItem('driveFileId',driveFileId);
-  }
-}
+      // 3. Category View
+      function renderCategory(category) {
+          const container = document.getElementById('appContent');
+          const categoryEntries = entries.filter(e => e.category === category);
 
-async function loadFromDrive() {
-  if (!driveFileId) return;
-  const token = gapi.client.getToken();
-  const res = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
-    {headers:{Authorization:`Bearer ${token.access_token}`}}
-  );
-  entries = await res.json();
-  localStorage.setItem('wikiEntries',JSON.stringify(entries));
-  renderHome();
-}
+          container.innerHTML = `
+              <div class="max-w-6xl mx-auto fade-enter">
+                  <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                      <span class="cursor-pointer hover:text-white" onclick="renderDashboard()">Dashboard</span>
+                      <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                      <span class="text-blue-400">${category}</span>
+                  </div>
 
-/* =======================
-   UI
-======================= */
-function toggleDriveConnection() {
-  if (!tokenClient) return;
+                  <header class="mb-10 flex justify-between items-end border-b border-white/5 pb-8">
+                      <div>
+                          <h2 class="text-4xl text-white tracking-tight font-normal mb-2">${category}</h2>
+                          <p class="text-lg text-gray-400 font-light">Browsing all entries within ${category}.</p>
+                      </div>
+                      <button onclick="openEditor('${category}')" class="flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-lg hover:bg-blue-600/20 transition-all text-sm">
+                          <i data-lucide="plus" class="w-4 h-4"></i> Add ${category}
+                      </button>
+                  </header>
 
-  if (!isDriveConnected) {
-    tokenClient.requestAccessToken({prompt:'consent'});
-  } else {
-    const token = gapi.client.getToken();
-    if (token) google.accounts.oauth2.revoke(token.access_token);
-    gapi.client.setToken('');
-    isDriveConnected=false;
-    localStorage.setItem('isDriveConnected','false');
-    localStorage.removeItem('driveFileId');
-    updateDriveButton();
-  }
-}
+                  ${categoryEntries.length > 0 ? `
+                      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          ${categoryEntries.map(entry => entryCard(entry)).join('')}
+                      </div>
+                  ` : `
+                      <div class="text-center py-20 border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+                          <p class="text-gray-500 mb-4">No entries found in this category.</p>
+                          <button onclick="openEditor('${category}')" class="text-blue-400 hover:text-blue-300 underline underline-offset-4 decoration-blue-500/30">Create the first one</button>
+                      </div>
+                  `}
+              </div>
+          `;
+          lucide.createIcons();
+      }
 
-function updateDriveButton() {
-  document.getElementById('driveStatusText').textContent =
-    isDriveConnected ? 'Disconnect Drive':'Connect Drive';
-  lucide.createIcons();
-}
+      // 4. Single Entry View
+      function renderEntry(id) {
+          const entry = entries.find(e => e.id === id);
+          if (!entry) return;
+          const container = document.getElementById('appContent');
 
-/* =======================
-   APP
-======================= */
-function renderHome() {
-  document.getElementById('appContent').innerHTML = `
-    <h1 class="text-4xl mb-6">Entries</h1>
-    ${entries.map(e=>`
-      <div class="mb-4 p-4 bg-white/5 rounded">
-        <h2 class="text-xl">${e.title}</h2>
-        <p class="text-gray-400">${e.content}</p>
-      </div>`).join('')}
-  `;
-}
+          // Convert newlines to paragraphs
+          const formattedContent = entry.content.split('\n').map(p => p.trim() ? `<p class="mb-6 leading-8">${p}</p>` : '').join('');
 
-function openEditor(){}
+          container.innerHTML = `
+              <div class="max-w-3xl mx-auto fade-enter pt-4">
+                  <div class="flex items-center gap-2 text-sm text-gray-500 mb-8 font-light">
+                      <span class="cursor-pointer hover:text-white" onclick="renderDashboard()">Dashboard</span>
+                      <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                      <span class="cursor-pointer hover:text-white" onclick="renderCategory('${entry.category}')">${entry.category}</span>
+                      <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                      <span class="text-white truncate max-w-[200px]">${entry.title}</span>
+                  </div>
 
-function saveLocal() {
-  localStorage.setItem('wikiEntries',JSON.stringify(entries));
-  if (isDriveConnected) saveToDrive();
-}
+                  <div class="mb-10">
+                      <div class="flex items-center gap-3 mb-4">
+                          <span class="px-2 py-1 rounded text-xs font-medium uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">${entry.category}</span>
+                          ${entry.tags.map(tag => `<span class="text-xs text-gray-500">#${tag}</span>`).join('')}
+                      </div>
+                      <h1 class="text-5xl md:text-6xl text-white tracking-tighter font-normal mb-8 leading-[1.1]">${entry.title}</h1>
 
-/* =======================
-   INIT
-======================= */
-loadScripts();
-renderHome();
-lucide.createIcons();
-updateDriveButton();
-</script>
-</body>
-</html>
+                      <div class="flex items-center gap-4 border-y border-white/5 py-4 text-sm text-gray-500">
+                          <div class="flex items-center gap-2">
+                              <i data-lucide="calendar" class="w-4 h-4"></i>
+                              <span>Updated ${entry.lastUpdated}</span>
+                          </div>
+                          <div class="flex-1"></div>
+                          <button onclick="openEditor(null, '${entry.id}')" class="flex items-center gap-2 hover:text-white transition-colors">
+                              <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
+                          </button>
+                          <button onclick="deleteEntry('${entry.id}')" class="flex items-center gap-2 hover:text-red-400 transition-colors">
+                              <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+                          </button>
+                      </div>
+                  </div>
+
+                  <article class="prose prose-invert prose-lg max-w-none text-gray-300 font-light">
+                      ${formattedContent}
+                  </article>
+
+                  <!-- Backlinks / Related (Simulated) -->
+                  <div class="mt-20 pt-10 border-t border-white/5">
+                      <h4 class="text-sm font-medium text-gray-500 uppercase tracking-widest mb-6">Related Entries</h4>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          ${entries.filter(e => e.id !== id && e.category === entry.category).slice(0,2).map(e => `
+                              <div onclick="renderEntry('${e.id}')" class="cursor-pointer p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+                                  <h5 class="text-white font-medium mb-1">${e.title}</h5>
+                                  <p class="text-xs text-gray-500 line-clamp-1">${e.content}</p>
+                              </div>
+                          `).join('')}
+                      </div>
+                  </div>
+              </div>
+          `;
+          lucide.createIcons();
+      }
+
+      // 5. Editor View (Modal/Overlay style)
+      function openEditor(prefillCategory = null, editId = null) {
+          const container = document.getElementById('appContent');
+
+          let data = { title: '', category: prefillCategory || 'Lore', tags: '', content: '' };
+          if (editId) {
+              const existing = entries.find(e => e.id === editId);
+              if (existing) {
+                  data = { ...existing, tags: existing.tags.join(', ') };
+              }
+          }
+
+          container.innerHTML = `
+              <div class="max-w-4xl mx-auto fade-enter">
+                  <div class="flex items-center justify-between mb-8">
+                      <h2 class="text-3xl text-white tracking-tight font-normal">
+                          ${editId ? 'Edit Entry' : 'Create New Entry'}
+                      </h2>
+                      <button onclick="${editId ? `renderEntry('${editId}')` : 'renderDashboard()'}" class="text-gray-400 hover:text-white text-sm">Cancel</button>
+                  </div>
+
+                  <form id="entryForm" onsubmit="handleSave(event, '${editId || ''}')" class="space-y-8">
+
+                      <!-- Title Input -->
+                      <div class="group">
+                          <label class="block text-xs font-medium uppercase tracking-widest text-gray-500 mb-2">Title</label>
+                          <input type="text" name="title" value="${data.title}" required placeholder="e.g. The Void Gate"
+                              class="w-full bg-transparent text-4xl md:text-5xl font-light text-white placeholder-gray-700 border-b border-white/10 pb-4 focus:outline-none focus:border-blue-500 transition-colors">
+                      </div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <!-- Category Select -->
+                          <div>
+                              <label class="block text-xs font-medium uppercase tracking-widest text-gray-500 mb-2">Category</label>
+                              <div class="relative">
+                                  <select name="category" class="w-full appearance-none bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors">
+                                      ${categories.map(c => `<option value="${c}" ${c === data.category ? 'selected' : ''} class="bg-gray-900">${c}</option>`).join('')}
+                                  </select>
+                                  <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"></i>
+                              </div>
+                          </div>
+
+                          <!-- Tags Input -->
+                          <div>
+                              <label class="block text-xs font-medium uppercase tracking-widest text-gray-500 mb-2">Tags (comma separated)</label>
+                              <input type="text" name="tags" value="${data.tags}" placeholder="e.g. History, War, Magic"
+                                  class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors">
+                          </div>
+                      </div>
+
+                      <!-- Content Textarea -->
+                      <div>
+                          <label class="block text-xs font-medium uppercase tracking-widest text-gray-500 mb-2">Content</label>
+                          <textarea name="content" required rows="12" placeholder="Start writing..."
+                              class="w-full bg-white/5 border border-white/10 rounded-xl p-6 text-lg text-gray-300 font-light leading-relaxed focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-colors resize-y">${data.content}</textarea>
+                      </div>
+
+                      <div class="flex justify-end gap-4 pt-4 border-t border-white/5">
+                          <button type="button" onclick="${editId ? `renderEntry('${editId}')` : 'renderDashboard()'}" class="px-6 py-3 rounded-full text-gray-400 hover:text-white transition-colors">Discard</button>
+                          <button type="submit" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-medium shadow-[0_0_20px_-5px_rgba(59,130,246,0.6)] transition-all transform hover:scale-105">
+                              ${editId ? 'Save Changes' : 'Publish Entry'}
+                          </button>
+                      </div>
+                  </form>
+              </div>
+          `;
+          lucide.createIcons();
+      }
+
+      // --- Helper Components & Logic ---
+
+      function entryCard(entry) {
+          return `
+              <div onclick="renderEntry('${entry.id}')" class="group cursor-pointer flex flex-col justify-between h-full bg-white/[0.02] border border-white/5 hover:border-blue-500/40 rounded-xl p-6 transition-all hover:bg-white/[0.04] hover:-translate-y-1">
+                  <div>
+                      <div class="flex justify-between items-start mb-4">
+                          <span class="text-xs font-medium text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded border border-blue-500/20">${entry.category}</span>
+                          <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover:text-blue-400 transition-colors"></i>
+                      </div>
+                      <h4 class="text-xl text-white font-normal mb-2 tracking-tight group-hover:text-blue-100 transition-colors">${entry.title}</h4>
+                      <p class="text-sm text-gray-500 line-clamp-3 font-light leading-relaxed">${entry.content}</p>
+                  </div>
+                  <div class="mt-6 flex flex-wrap gap-2">
+                      ${entry.tags.slice(0, 3).map(t => `<span class="text-[10px] uppercase tracking-wider text-gray-600">#${t}</span>`).join('')}
+                  </div>
+              </div>
+          `;
+      }
+
+      function handleSave(event, id) {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const entryData = {
+              title: formData.get('title'),
+              category: formData.get('category'),
+              tags: formData.get('tags').split(',').map(t => t.trim()).filter(t => t),
+              content: formData.get('content'),
+              lastUpdated: new Date().toISOString().split('T')[0]
+          };
+
+          if (id) {
+              const index = entries.findIndex(e => e.id === id);
+              entries[index] = { ...entries[index], ...entryData };
+              renderEntry(id);
+          } else {
+              const newId = Date.now().toString();
+              entries.push({ id: newId, ...entryData });
+              renderDashboard();
+          }
+          saveToLocal();
+      }
+
+      function deleteEntry(id) {
+          if(confirm('Are you sure you want to delete this entry? This cannot be undone.')) {
+              entries = entries.filter(e => e.id !== id);
+              saveToLocal();
+              renderDashboard();
+          }
+      }
+
+      // Global Search Logic
+      function handleSearch(query) {
+          const resultsContainer = document.getElementById('searchResults');
+          if (!query.trim()) {
+              resultsContainer.classList.add('hidden');
+              return;
+          }
+
+          const lowerQuery = query.toLowerCase();
+          const results = entries.filter(e =>
+              e.title.toLowerCase().includes(lowerQuery) ||
+              e.content.toLowerCase().includes(lowerQuery) ||
+              e.tags.some(t => t.toLowerCase().includes(lowerQuery))
+          );
+
+          resultsContainer.innerHTML = results.length > 0
+              ? results.slice(0, 5).map(e => `
+                  <div onclick="renderEntry('${e.id}'); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('globalSearch').value=''"
+                      class="p-3 hover:bg-white/10 cursor-pointer border-b border-white/5 last:border-0 flex items-center justify-between group">
+                      <div>
+                          <p class="text-sm text-white group-hover:text-blue-200">${e.title}</p>
+                          <p class="text-xs text-gray-500">${e.category}</p>
+                      </div>
+                      <i data-lucide="corner-down-left" class="w-3 h-3 text-gray-600"></i>
+                  </div>
+              `).join('')
+              : `<div class="p-4 text-xs text-gray-500 text-center">No results found in archives.</div>`;
+
+          resultsContainer.classList.remove('hidden');
+      }
+
+      // Close search when clicking outside
+      document.addEventListener('click', (e) => {
+          const searchContainer = document.querySelector('.relative.group');
+          if (!searchContainer.contains(e.target)) {
+              document.getElementById('searchResults').classList.add('hidden');
+          }
+      });
+
+      // Initialize Icons & Home
+      lucide.createIcons();
+      renderHome();
+    </script>
+  
+</body></html>
