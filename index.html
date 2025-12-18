@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Galactic Archives - Worldbuilding Wiki</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -26,12 +26,16 @@ body { background:#000; color:#e2e8f0; }
 
 <nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-md">
   <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-    <div class="flex items-center gap-8">
-      <button onclick="renderHome()" class="text-2xl text-white">Galactic</button>
-    </div>
-    <div class="flex items-center gap-4">
+    <a onclick="renderHome()" class="text-2xl text-white cursor-pointer">Galactic</a>
+
+    <div class="flex gap-4">
       <button onclick="openEditor()" class="px-4 py-2 bg-white/10 rounded-full">New Entry</button>
-      <button id="driveConnectBtn" onclick="toggleDriveConnection()" class="px-4 py-2 bg-white/10 rounded-full flex gap-2 items-center">
+
+      <!-- DRIVE BUTTON -->
+      <button id="driveConnectBtn"
+        disabled
+        onclick="toggleDriveConnection()"
+        class="px-4 py-2 bg-white/10 rounded-full flex gap-2 items-center opacity-50 cursor-not-allowed">
         <i data-lucide="cloud"></i>
         <span id="driveStatusText">Connect Drive</span>
       </button>
@@ -48,7 +52,6 @@ body { background:#000; color:#e2e8f0; }
 const initialData = [
   {id:'1',title:'The Great Expansion',category:'Events',tags:['History'],content:'Humanity expands.',lastUpdated:'2045-10-12'}
 ];
-
 let entries = JSON.parse(localStorage.getItem('wikiEntries')) || initialData;
 
 /* =======================
@@ -79,7 +82,7 @@ function loadScripts() {
 
 function initGapi() {
   gapi.client.init({
-    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+    discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
   });
 }
 
@@ -89,25 +92,31 @@ function initGis() {
     scope: SCOPES,
     callback: onAuth
   });
+
+  // ENABLE BUTTON
+  const btn = document.getElementById('driveConnectBtn');
+  btn.disabled = false;
+  btn.classList.remove('opacity-50','cursor-not-allowed');
 }
 
 /* =======================
-   AUTH FLOW (FIXED)
+   AUTH CALLBACK (FIXED)
 ======================= */
 async function onAuth(resp) {
   if (resp.error) return console.error(resp);
 
-  // 🔥 REQUIRED LINE (THIS WAS MISSING)
+  // 🔥 REQUIRED
   gapi.client.setToken(resp);
 
   isDriveConnected = true;
   localStorage.setItem('isDriveConnected','true');
   updateDriveButton();
-  await loadFromDrive();
+
+  await loadFromDrive().catch(()=>{});
 }
 
 /* =======================
-   DRIVE FUNCTIONS
+   DRIVE
 ======================= */
 async function saveToDrive() {
   const token = gapi.client.getToken();
@@ -115,6 +124,7 @@ async function saveToDrive() {
 
   const body = JSON.stringify(entries,null,2);
   const boundary = 'foo_bar';
+
   const multipart =
     `--${boundary}\r\nContent-Type: application/json\r\n\r\n`+
     JSON.stringify({name:DRIVE_FILE_NAME})+
@@ -157,10 +167,13 @@ async function loadFromDrive() {
    UI
 ======================= */
 function toggleDriveConnection() {
+  if (!tokenClient) return;
+
   if (!isDriveConnected) {
     tokenClient.requestAccessToken({prompt:'consent'});
   } else {
-    google.accounts.oauth2.revoke(gapi.client.getToken().access_token);
+    const token = gapi.client.getToken();
+    if (token) google.accounts.oauth2.revoke(token.access_token);
     gapi.client.setToken('');
     isDriveConnected=false;
     localStorage.setItem('isDriveConnected','false');
