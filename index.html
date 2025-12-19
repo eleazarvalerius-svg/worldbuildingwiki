@@ -8,10 +8,12 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* Keep the dark aesthetic and small glow effects from your original */
     body {
       background-color: #000;
       color: #e2e8f0;
     }
+
     /* Custom scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #02040a; }
@@ -22,14 +24,16 @@
     .btn-glow { box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.5); }
 
     .fade-enter { opacity: 0; transform: translateY(10px); animation: fadein 0.3s forwards ease-out; }
-    @keyframes fadein {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadein { to { opacity: 1; transform: translateY(0); } }
+
+    /* If you rely on classes like bg-space-950 or bg-star-gradient in your Tailwind config,
+       they must come from your custom Tailwind setup. The HTML retains them unchanged. */
   </style>
 </head>
-<body class="font-sans min-h-screen bg-black/80 selection:bg-blue-500/30 selection:text-blue-100 flex flex-col overflow-hidden">
+
+<body class="font-sans min-h-screen bg-space-950 bg-star-gradient bg-no-repeat bg-fixed selection:bg-blue-500/30 selection:text-blue-100 flex flex-col overflow-hidden">
   <!-- Navbar -->
-  <nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-black/80 backdrop-blur-md">
+  <nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-space-950/80 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <div class="flex items-center gap-8">
         <!-- Logo -->
@@ -54,7 +58,7 @@
           <input type="text" id="globalSearch" placeholder="Search archives..." oninput="handleSearch(this.value)"
                  class="bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-gray-200 w-64 focus:outline-none" />
           <!-- Dropdown for search results -->
-          <div id="searchResults" class="absolute top-full mt-2 left-0 w-full bg-black/90 border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden"></div>
+          <div id="searchResults" class="absolute top-full mt-2 left-0 w-full bg-space-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden"></div>
         </div>
 
         <!-- New Entry Button -->
@@ -65,7 +69,7 @@
 
         <!-- Google Drive Connect Button -->
         <div class="flex items-center gap-2">
-          <button id="driveConnectBtn" onclick="toggleDriveConnection()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2 rounded-full text-sm">
+          <button id="driveConnectBtn" onclick="toggleDriveConnection()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/10 hover:border-green-400/30 text-white px-4 py-2 rounded-full text-sm">
             <i data-lucide="cloud" class="w-4 h-4"></i>
             <span id="driveStatusText">Connect Drive</span>
           </button>
@@ -86,8 +90,8 @@
 
   <!-- Main Layout -->
   <div class="flex flex-1 overflow-hidden">
-    <!-- Sidebar -->
-    <aside class="w-64 border-r border-white/5 bg-black/50 hidden lg:flex flex-col py-8 px-4 gap-6 overflow-y-auto">
+    <!-- Sidebar (Optional for larger screens, hidden on mobile for now) -->
+    <aside class="w-64 border-r border-white/5 bg-space-950/50 hidden lg:flex flex-col py-8 px-4 gap-6 overflow-y-auto">
       <div class="px-2">
         <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-4 font-medium">Library</h3>
         <nav class="flex flex-col gap-1">
@@ -119,7 +123,7 @@
         <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-4 font-medium">System</h3>
         <div class="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/5 rounded-xl p-4">
           <p class="text-xs text-blue-200 mb-2">Wiki Status: <span class="text-green-400">Online</span></p>
-          <div class="w-full bg-black h-1.5 rounded-full overflow-hidden">
+          <div class="w-full bg-space-900 h-1.5 rounded-full overflow-hidden">
             <div class="bg-blue-500 h-full w-3/4 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
           </div>
           <p class="text-[10px] text-gray-500 mt-2 text-right">v2.4.0 Galactic</p>
@@ -136,7 +140,7 @@
   <!-- Scroll top button -->
   <button id="scrollTopBtn" onclick="document.getElementById('appContent').scrollTo({ top: 0, behavior: 'smooth' })"
           class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full btn-glow opacity-0 pointer-events-none transform translate-y-10 transition-all">
-    <i data-lucide="arrow-up" class="w-6 h-6"></i>
+    <i data-lucide="arrow-up" class="w-6 h-6 group-hover:-translate-y-1 transition-transform"></i>
   </button>
 
   <script>
@@ -155,14 +159,14 @@
   </script>
 
   <script>
-    // --- Mock Database (cleaned up) ---
+    // --- Mock Database ---
     const initialData = [
       {
         id: '1',
         title: 'The Great Expansion',
         category: 'Events',
         tags: ['History', 'Space Travel'],
-        content: "The Great Expansion marked the beginning of humanity's journey beyond the Sol system. Fueled by the discovery of the Void Drive, colony ships were dispatched to nearby systems and beyond.",
+        content: 'The Great Expansion marked the beginning of humanity\'s journey beyond the Sol system. Fueled by the discovery of the Void Drive, colony ships were dispatched to nearby systems and beyond.',
         lastUpdated: '2045-10-12'
       },
       {
@@ -170,7 +174,7 @@
         title: 'Commander Vex',
         category: 'Characters',
         tags: ['Hero', 'Military', 'Human'],
-        content: "Commander Vex is a legendary figure in the Terran Fleet. Known for his tactical brilliance during the Siege of Orion, he coordinated the defense of several colonies.",
+        content: 'Commander Vex is a legendary figure in the Terran Fleet. Known for his tactical brilliance during the Siege of Orion, he single-handedly coordinated the defense of the colony under extreme conditions.',
         lastUpdated: '2045-11-05'
       },
       {
@@ -178,7 +182,7 @@
         title: 'Void Drive',
         category: 'Magic',
         tags: ['Technology', 'Physics'],
-        content: "The Void Drive manipulates dark matter to fold local space-time, allowing for faster-than-light travel without time dilation effects usually associated with relativistic speeds.",
+        content: 'The Void Drive manipulates dark matter to fold local space-time, allowing for faster-than-light travel without time dilation effects usually associated with relativistic speeds.',
         lastUpdated: '2045-09-20'
       },
       {
@@ -196,11 +200,11 @@
 
     // Google Drive Configuration
     // ============================================
-    // SETUP INSTRUCTIONS: same as before
+    // SETUP INSTRUCTIONS (unchanged)
     // ============================================
     const GOOGLE_CLIENT_ID = '1073328285370-leiiu235gcp0ujm9s7pagi6p9quui977.apps.googleusercontent.com';
     const DRIVE_FILE_NAME = 'galactic-archives-wiki.json';
-    // Keep drive.file for file creation/opening, add metadata readonly so we can list folders
+    // allow creation/opening plus metadata listing so we can list folders
     const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly';
 
     let gapiLoaded = false;
@@ -216,9 +220,7 @@
     function gapiLoadedCallback() {
       console.log('GAPI loaded');
       gapiLoaded = true;
-      if (window.gapi && gapi.load) {
-        gapi.load('client', initializeGapiClient);
-      }
+      if (window.gapi && gapi.load) gapi.load('client', initializeGapiClient);
     }
 
     function gisLoadedCallback() {
@@ -247,7 +249,7 @@
           tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: GOOGLE_CLIENT_ID,
             scope: SCOPES,
-            callback: '', // defined later when requesting
+            callback: '', // set later when requesting
           });
           updateDriveButton();
         } else {
@@ -282,14 +284,11 @@
     // Save to both localStorage and Google Drive
     const saveToLocal = () => {
       localStorage.setItem('wikiEntries', JSON.stringify(entries));
-      if (isDriveConnected && gapiInited) {
-        saveToDrive();
-      }
+      if (isDriveConnected && gapiInited) saveToDrive();
     };
 
     // Google Drive Functions
     async function saveToDrive() {
-      // Make sure user authorized and token exists
       if (!gapi.client || !gapi.client.getToken() || !gapi.client.getToken().access_token) {
         console.log('Not authenticated with Google Drive');
         return;
@@ -298,7 +297,6 @@
       try {
         const fileContent = JSON.stringify(entries, null, 2);
 
-        // Build metadata, include parents if a folder is selected
         const metadata = {
           name: DRIVE_FILE_NAME,
           mimeType: 'application/json',
@@ -319,7 +317,7 @@
           closeDelim;
 
         if (driveFileId) {
-          // Update existing file (PATCH multipart)
+          // Update existing file
           const response = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`, {
             method: 'PATCH',
             headers: {
@@ -330,7 +328,7 @@
           });
 
           if (response.ok) {
-            console.log('Successfully saved to Google Drive (updated existing file)');
+            console.log('Successfully saved to Google Drive (update)');
             showNotification('Saved to Google Drive', 'success');
           } else {
             const errorText = await response.text();
@@ -338,7 +336,7 @@
             throw new Error('Failed to update file');
           }
         } else {
-          // Create new file in Drive
+          // Create new file
           const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
             method: 'POST',
             headers: {
@@ -374,7 +372,6 @@
 
       try {
         if (!driveFileId) {
-          // Try to find the file by name
           const response = await gapi.client.drive.files.list({
             q: `name='${DRIVE_FILE_NAME}' and trashed=false`,
             fields: 'files(id, name)',
@@ -390,19 +387,19 @@
           }
         }
 
-        const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
           headers: { 'Authorization': `Bearer ${gapi.client.getToken().access_token}` }
         });
 
-        if (resp.ok) {
-          const text = await resp.text();
+        if (response.ok) {
+          const text = await response.text();
           const data = JSON.parse(text);
           entries = data;
           localStorage.setItem('wikiEntries', JSON.stringify(entries));
           showNotification('Loaded from Google Drive', 'success');
           if (typeof renderDashboard === 'function') renderDashboard();
         } else {
-          const errorText = await resp.text();
+          const errorText = await response.text();
           console.error('Drive load error:', errorText);
           throw new Error('Failed to load file');
         }
@@ -490,7 +487,7 @@
           btn.querySelector('i').setAttribute('data-lucide', 'cloud');
         }
         if (folderText) {
-          folderText.textContent = driveFolderName ? (driveFolderName.length > 22 ? driveFolderName.slice(0,22)+'…' : driveFolderName) : 'Choose Folder';
+          folderText.textContent = driveFolderName ? (driveFolderName.length > 20 ? driveFolderName.slice(0,20) + '…' : driveFolderName) : 'Choose Folder';
         }
         lucide.createIcons();
       }
@@ -517,16 +514,19 @@
 
     const categories = ['Lore', 'Characters', 'Locations', 'Timelines', 'Factions', 'Magic', 'Events'];
 
-    // --- Render Functions ---
+    // --- Render functions (keep original aesthetic layouts) ---
     function renderHome() {
       const container = document.getElementById('appContent');
       container.innerHTML = `
         <div class="flex flex-col items-center justify-center min-h-[80vh] text-center max-w-4xl mx-auto fade-enter relative z-10">
           <div class="absolute inset-0 bg-blue-500/10 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
+
           <span class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-6 border border-blue-500/20 px-4 py-1.5 rounded-full bg-blue-500/5">System Initialized</span>
+
           <h1 class="text-6xl md:text-8xl font-normal text-white tracking-tighter mb-8 leading-[0.9] text-glow">
             EXPLORE <br/> <span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">THE ARCHIVES</span>
           </h1>
+
           <p class="text-xl md:text-2xl text-gray-400 font-light max-w-2xl mb-12 leading-relaxed">
             The central repository for all knowledge regarding the universe, its inhabitants, and the forces that shape our destiny.
           </p>
@@ -566,7 +566,6 @@
 
     function renderDashboard() {
       const container = document.getElementById('appContent');
-
       const recentEntries = [...entries].sort((a,b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)).slice(0, 6);
 
       container.innerHTML = `
@@ -849,7 +848,7 @@
       lucide.createIcons();
     }
 
-    // Close search when clicking outside - safe null checks
+    // Close search when clicking outside
     document.addEventListener('click', (e) => {
       const searchContainer = document.querySelector('.search-group');
       if (!searchContainer) return;
@@ -891,7 +890,7 @@
         modal.className = 'fixed inset-0 z-60 flex items-center justify-center p-6';
         modal.style.background = 'rgba(2,6,23,0.6)';
         modal.innerHTML = `
-          <div class="w-full max-w-2xl bg-black/90 border border-white/10 rounded-xl p-6">
+          <div class="w-full max-w-2xl bg-space-950 border border-white/10 rounded-xl p-6">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg text-white font-medium">Select Drive Folder</h3>
               <button id="driveFolderClose" class="text-gray-400 hover:text-white">Close</button>
@@ -949,11 +948,19 @@
       });
     }
 
-    // Initialize Icons & Home
-    lucide.createIcons();
+    // Final initialization: ensure icons & content render after scripts load
+    // This avoids a race where a parse/runtime error earlier prevents renderHome from running.
+    try {
+      lucide.createIcons();
+    } catch (e) {
+      console.warn('lucide not ready yet', e);
+    }
     updateDriveButton();
-    // Render the home view on load
-    renderHome();
+    // renderHome on load to ensure the initial content appears
+    // call after a tiny delay to avoid any micro-race with icon initialization
+    setTimeout(() => {
+      try { renderHome(); } catch (err) { console.error('Failed to render home on init', err); }
+    }, 50);
   </script>
 </body>
 </html>
